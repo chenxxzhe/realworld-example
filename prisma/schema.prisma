@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique @db.VarChar(255)
+  username   String    @unique @db.VarChar(50)
+  password   String    @db.VarChar(100)
+  bio        String?   @db.VarChar(255)
+  image      String?   @db.VarChar(255)
+  articles   Article[] @relation("authors")
+  comments   Comment[]
+  followedBy User[]    @relation("follows") // 关注 我 的
+  following  User[]    @relation("follows") // 我 关注的
+  favorites  Article[] @relation("favorites")
+}
+
+// 显式声明
+// model Follows {
+//   follower    User @relation("follower", fields: [followerId], references: [id])
+//   followerId  Int
+//   following   User @relation("following", fields: [followingId], references: [id])
+//   followingId Int
+
+//   @@id([followerId, followingId])
+// }
+
+model Article {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique @db.VarChar(255)
+  title       String    @unique @db.VarChar(255)
+  description String    @db.VarChar(1024)
+  body        String
+  tags        Tag[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  favoritedBy User[]    @relation("favorites")
+  author      User      @relation("authors", fields: [authorId], references: [id])
+  authorId    Int
+  comments    Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  body      String   @db.VarChar(200)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  article   Article  @relation(fields: [articleId], references: [id])
+  articleId Int
+}
+
+model Tag {
+  id       Int       @id @default(autoincrement())
+  title    String    @unique @db.VarChar(50)
+  articles Article[]
+}
