@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { PrismaService } from 'nestjs-prisma'
 import { CreateCommentDto } from './dto/create-comment.dto'
 
@@ -6,31 +6,48 @@ import { CreateCommentDto } from './dto/create-comment.dto'
 export class CommentService {
   constructor(private readonly p: PrismaService) {}
 
-  async create(articleSlug: string, dto: CreateCommentDto, authorId: number) {
-    const article = await this.p.article.findFirstOrThrow({
-      where: { slug: articleSlug },
+  async create(slug: string, dto: CreateCommentDto, currentUserId: number) {
+    const article = await this.p.article.findUniqueOrThrow({
+      where: { slug },
       select: { id: true },
     })
     return this.p.comment.create({
       data: {
         ...dto,
-        articleId: article!.id,
-        authorId,
+        article: { connect: { id: article.id } },
+        author: { connect: { id: currentUserId } },
+      },
+      include: {
+        author: true,
       },
     })
   }
 
-  getAllFrom(articleSlug: string) {
+  getAllFrom(slug: string) {
     return this.p.comment.findMany({
       where: {
         article: {
-          slug: articleSlug,
+          slug,
         },
+      },
+      include: {
+        author: true,
       },
     })
   }
 
-  remove(id: number) {
+  async remove(id: number, currentUserId: number) {
+    await this.validateAuthor(id, currentUserId)
     return this.p.comment.delete({ where: { id } })
+  }
+
+  private async validateAuthor(commentId: number, authorId: number) {
+    const res = await this.p.comment.findUnique({
+      where: { id: commentId },
+      select: { authorId: true },
+    })
+    if (!res?.authorId || res.authorId !== authorId) {
+      throw new UnauthorizedException('is not author')
+    }
   }
 }

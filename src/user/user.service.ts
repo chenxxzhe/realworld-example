@@ -25,12 +25,29 @@ export class UserService {
       })
   }
 
-  findOne(where: Prisma.UserWhereUniqueInput) {
-    return this.p.user.findUnique({ where })
+  findOne(where: Prisma.UserWhereUniqueInput, includePassword = false) {
+    return this.p.user.findUnique({ where }).then((res) => {
+      if (!res) return null
+      if (!includePassword) {
+        delete (res as any).password
+      }
+      return res
+    })
+  }
+  findOneMoreDetail(where: Prisma.UserWhereUniqueInput) {
+    return this.p.user.findUnique({
+      where,
+      include: { favorites: true, following: true, followedBy: true },
+    })
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return this.p.user.update({ where: { id }, data: updateUserDto })
+    return this.p.user
+      .update({ where: { id }, data: updateUserDto })
+      .then((res) => {
+        const { password, ...rest } = res
+        return rest
+      })
   }
 
   remove(id: number) {
@@ -41,7 +58,7 @@ export class UserService {
     return this.p.user.update({
       where: { username },
       data: {
-        favorites: {
+        followedBy: {
           connect: {
             id: currentUserId,
           },
@@ -54,7 +71,7 @@ export class UserService {
     return this.p.user.update({
       where: { username },
       data: {
-        favorites: {
+        followedBy: {
           disconnect: {
             id: currentUserId,
           },

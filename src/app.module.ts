@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
-import { PrismaModule } from 'nestjs-prisma'
 import { APP_GUARD } from '@nestjs/core'
 import { ConfigModule } from '@nestjs/config'
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
@@ -10,20 +9,20 @@ import { ArticlesModule } from './articles/articles.module'
 import { UserModule } from './user/user.module'
 import { AuthModule } from './auth/auth.module'
 import { LoggerModule } from './logger/logger.module'
+import { CustomPrismaModule } from './prisma/prisma.module'
 
 @Module({
   imports: [
-    LoggerModule,
-    PrismaModule.forRoot({
-      isGlobal: true,
-    }),
-    ArticlesModule,
-    UserModule,
-    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true,
     }),
+    LoggerModule,
+    CustomPrismaModule,
+    AuthModule,
+    ArticlesModule,
+    UserModule,
+
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 60,

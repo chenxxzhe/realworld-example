@@ -41,7 +41,7 @@ model Article {
   title       String    @unique @db.VarChar(255)
   description String    @db.VarChar(1024)
   body        String
-  tags        Tag[]
+  tagList     Tag[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   favoritedBy User[]    @relation("favorites")
@@ -57,7 +57,7 @@ model Comment {
   body      String   @db.VarChar(200)
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
-  article   Article  @relation(fields: [articleId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   articleId Int
 }
 

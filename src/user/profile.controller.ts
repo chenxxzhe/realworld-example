@@ -10,13 +10,17 @@ export class ProfileController {
   @Public()
   @Get(':username')
   getProfile(@Param('username') username: string) {
-    return this.userService.findOne({ username })
+    return this.userService
+      .findOneMoreDetail({ username })
+      .then((res) => ({ profile: res }))
   }
 
   @Post(':username/follow')
   follow(@Param('username') username: string, @Request() req: { user: User }) {
     const { id } = req.user
-    return this.userService.follow(username, id)
+    return this.userService
+      .follow(username, id)
+      .then((res) => ({ profile: { ...res, following: true } }))
   }
 
   @Delete(':username/follow')
@@ -25,6 +29,8 @@ export class ProfileController {
     @Request() req: { user: User },
   ) {
     const { id } = req.user
-    return this.userService.unfollow(username, id)
+    return this.userService
+      .unfollow(username, id)
+      .then((res) => ({ profile: { ...res, following: false } }))
   }
 }

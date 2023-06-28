@@ -25,7 +25,8 @@ pnpm build
 5. 编写登录授权逻辑 passport, 只是用 jwt, 不用 local(自己实现)
 6. 安全设置: helmet, rate limit
 7. 新建 CRUD resource, 编写业务
-8. 设置 log 使用 winston `https://www.npmjs.com/package/nest-winston`, `https://lsmod.medium.com/nestjs-setting-up-file-logging-daily-rotation-with-winston-28147af56ec4`  `https://juejin.cn/post/7187910528918880311`
+8. 设置 log 使用 winston `https://www.npmjs.com/package/nest-winston`, `https://lsmod.medium.com/nestjs-setting-up-file-logging-daily-rotation-with-winston-28147af56ec4`  `https://juejin.cn/post/7187910528918880311`;
+  - 使用 interceptor 与 filter 写 info log; error log 通过`useLogger`绑定到 nest 上,自动写
 9. 运行 postgresql
 10. dev 运行项目调试
 11. TODO: 部署运行 docker

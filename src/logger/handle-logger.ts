@@ -1,7 +1,11 @@
 import { LoggerService } from '@nestjs/common'
 import { HttpArgumentsHost } from '@nestjs/common/interfaces'
 
-export function handleLogger(http: HttpArgumentsHost, logger: LoggerService) {
+export function handleLogger(
+  http: HttpArgumentsHost,
+  logger: LoggerService,
+  exceptionMessage?: string,
+) {
   const req = http.getRequest()
   const res = http.getResponse()
 
@@ -17,7 +21,8 @@ export function handleLogger(http: HttpArgumentsHost, logger: LoggerService) {
     if (rawBody === '{}') rawBody = ''
   } catch {}
 
+  const error = exceptionMessage ? 'Exception:' + exceptionMessage : ''
   logger.log(
-    `[${ip}]${headers.host}; [${method}] ${res.statusCode} ${url} ${rawBody}`,
+    `[${ip}]${headers.host}; [${method}]${url} ${rawBody} - ${res.statusCode} ${error}`,
   )
 }

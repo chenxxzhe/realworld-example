@@ -18,7 +18,10 @@ export class LoggerInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    handleLogger(context.switchToHttp(), this.logger)
-    return next.handle().pipe()
+    return next.handle().pipe(
+      tap(() => {
+        handleLogger(context.switchToHttp(), this.logger)
+      }),
+    )
   }
 }

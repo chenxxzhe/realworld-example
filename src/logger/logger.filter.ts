@@ -22,12 +22,8 @@ export class LoggerExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>()
     // const request = ctx.getRequest<Request>()
     const status = exception.getStatus()
+    response.status(status).send(exception.getResponse())
 
-    response.status(status).json({
-      message: exception.message,
-      statusCode: status,
-    })
-
-    handleLogger(ctx, this.logger)
+    handleLogger(ctx, this.logger, exception.message)
   }
 }
