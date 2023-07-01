@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../packages/nestjs"
+		},
+		{
+			"path": "../",
+      "name": "root"
+		}
+  ],
+  "settings": {
+    "files.exclude": {
+      "packages/": true
+    },
+  }
+}
