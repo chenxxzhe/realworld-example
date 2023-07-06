@@ -3,6 +3,7 @@
 /**
  * Module dependencies.
  */
+import 'dotenv/config'
 import app from './app'
 import debug from 'debug'
 import { createServer } from 'http'
