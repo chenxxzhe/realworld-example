@@ -4,9 +4,11 @@
  * Module dependencies.
  */
 import 'dotenv/config'
+import 'express-async-errors'
 import app from './app'
 import debug from 'debug'
 import { createServer } from 'http'
+
 const log = debug('express:server')
 
 /**
@@ -84,5 +86,4 @@ function onListening() {
   const addr = server.address()
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr?.port
   log('Listening on ' + bind)
-  console.log('123')
 }

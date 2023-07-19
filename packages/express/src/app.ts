@@ -1,12 +1,9 @@
-import * as express from 'express'
+import express from 'express'
 import { join } from 'path'
-import * as cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser'
 import morgan = require('morgan')
 
-import indexRouter from './routes/index'
-import usersRouter from './routes/users'
-
-debugger
+import { initRouter } from './routes'
 
 const app = express()
 
@@ -16,7 +13,18 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(join(__dirname, '../public')))
 
-app.use('/', indexRouter)
-app.use('/users', usersRouter)
+initRouter('/api', app)
+
+app.use((err: any, req: any, res: any, next: any) => {
+  if (err && err.error) {
+    res.status(400).json({
+      message: err.error.message,
+      detail: err.error.detail,
+    })
+  } else {
+    // pass on to another error handler
+    next(err)
+  }
+})
 
 export default app
