@@ -101,6 +101,7 @@ CREATE TABLE
     `articleId` INT UNSIGNED NOT NULL,
     `status` TINYINT (4) NOT NULL DEFAULT 0 COMMENT '收藏标记 0: 未收藏; 1: 已收藏',
     PRIMARY KEY `pk_id` (`id`),
+    UNIQUE INDEX `u_favorite_user_article` (`userId`, `articleId`),
     CONSTRAINT `fk_favorite_user` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
     CONSTRAINT `fk_favorite_article` FOREIGN KEY (`articleId`) REFERENCES `article` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
   ) ENGINE = InnoDB;
