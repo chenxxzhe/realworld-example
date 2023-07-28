@@ -18,7 +18,7 @@ export const initArticleModule = (app: Router) => {
   setAuthFree('GET', '/articles')
   articles.get('/', validateQuery(QueryArticleDto), async (req, res, next) => {
     const articles = await articleService.findMany(req.query, req.user?.id)
-    res.json({ articles, articleCount: 0 })
+    res.json(articles)
   })
   // 获取当前关注用户的文章
   articles.get(
@@ -26,7 +26,7 @@ export const initArticleModule = (app: Router) => {
     validateQuery(QueryArticleFeedDto),
     async (req, res, next) => {
       const articles = await articleService.findMany(req.query, req.user?.id)
-      res.json({ articles, articleCount: 0 })
+      res.json(articles)
     },
   )
   // 获取 文章详情
@@ -37,9 +37,9 @@ export const initArticleModule = (app: Router) => {
   // 创建
   articles.post('/', validateBody(CreateArticleDto), async (req, res, next) => {
     const body = req.body
-    const result = await articleService.create(body)
+    const article = await articleService.create(body.article, req.user!.id)
     // TODO: id
-    res.json({ article: body })
+    res.json({ article })
   })
   // 更新
   // TODO: 检查角色
@@ -48,8 +48,8 @@ export const initArticleModule = (app: Router) => {
     validateBody(UpdateArticleDto),
     async (req, res, next) => {
       const body = req.body
-      const result = await articleService.update(req.params.slug, body)
-      res.json(body)
+      const article = await articleService.update(req.params.slug, body.article)
+      res.json({ article })
     },
   )
   // 删除

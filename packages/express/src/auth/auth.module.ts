@@ -49,7 +49,9 @@ export const initAuthModule = (app: Router) => {
           delete user.password
           cb(null, user)
         } catch (err) {
-          cb(err, false, { message: 'Incorrect username or password.' })
+          cb({ error: err }, false, {
+            message: 'Incorrect username or password.',
+          })
         }
       },
     ),

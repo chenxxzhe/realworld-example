@@ -1,4 +1,4 @@
-import { MaxLength, ValidateNested, IsInt } from 'class-validator'
+import { MaxLength, ValidateNested, IsInt, IsOptional } from 'class-validator'
 
 // {
 //   "article": {
@@ -10,22 +10,29 @@ import { MaxLength, ValidateNested, IsInt } from 'class-validator'
 // }
 export class QueryArticleDto {
   @MaxLength(20)
+  @IsOptional()
   tag?: string
   @MaxLength(50)
+  @IsOptional()
   author?: string
   /** 搜索某个用户的收藏文章 */
   @MaxLength(50)
+  @IsOptional()
   favorited?: string
   @IsInt()
+  @IsOptional()
   limit?: number
   @IsInt()
+  @IsOptional()
   offset?: number
 }
 
 export class QueryArticleFeedDto {
   @IsInt()
+  @IsOptional()
   limit?: number
   @IsInt()
+  @IsOptional()
   offset?: number
 }
 
@@ -47,12 +54,16 @@ export class CreateArticleDto {
 
 class UpdateArticleDtoBase {
   @MaxLength(50)
+  @IsOptional()
   title?: string
   @MaxLength(200)
+  @IsOptional()
   description?: string
   @MaxLength(8000)
+  @IsOptional()
   body?: string
   @MaxLength(20, { each: true })
+  @IsOptional()
   tagList?: string[]
 }
 

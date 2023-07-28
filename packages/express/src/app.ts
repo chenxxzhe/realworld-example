@@ -23,7 +23,10 @@ app.use((err: any, req: any, res: any, next: any) => {
     })
   } else {
     // pass on to another error handler
-    next(err)
+    next(err.message || 'internal server error')
+    if (err.sql) {
+      console.log('\nSQL: ', err.sql, '\n')
+    }
   }
 })
 
