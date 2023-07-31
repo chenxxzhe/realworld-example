@@ -39,6 +39,7 @@ export function remove(id: number) {
 }
 
 export function bindTags(articleId: number, tagIdList: number[]) {
+  if (!tagIdList.length) return Promise.resolve()
   return pool
     .query(
       'INSERT INTO ref_tag_article (tagId, articleId, status) VALUES ? ON DUPLICATE KEY UPDATE status=VALUES(status)',
@@ -49,11 +50,9 @@ export function bindTags(articleId: number, tagIdList: number[]) {
     })
 }
 
-export function unbindTags(articleId: number, tagIdList: number[]) {
+export function unbindAllTags(articleId: number) {
   return pool
-    .query('UPDATE ref_tag_article SET ? status=0 WHERE tagId IN ?', [
-      tagIdList.map((id) => id),
-    ])
+    .query('UPDATE ref_tag_article SET status=0 WHERE articleId=?', articleId)
     .catch((err) => {
       throw err
     })

@@ -20,12 +20,16 @@ export const initArticleModule = (app: Router) => {
     const articles = await articleService.findMany(req.query, req.user?.id)
     res.json(articles)
   })
-  // 获取当前关注用户的文章
+  // 获取当前用户 关注的用户 的文章
   articles.get(
     '/feed',
     validateQuery(QueryArticleFeedDto),
     async (req, res, next) => {
-      const articles = await articleService.findMany(req.query, req.user?.id)
+      const articles = await articleService.findMany(
+        req.query,
+        req.user?.id,
+        true,
+      )
       res.json(articles)
     },
   )
@@ -38,17 +42,19 @@ export const initArticleModule = (app: Router) => {
   articles.post('/', validateBody(CreateArticleDto), async (req, res, next) => {
     const body = req.body
     const article = await articleService.create(body.article, req.user!.id)
-    // TODO: id
     res.json({ article })
   })
   // 更新
-  // TODO: 检查角色
   articles.put(
     '/:slug',
     validateBody(UpdateArticleDto),
     async (req, res, next) => {
       const body = req.body
-      const article = await articleService.update(req.params.slug, body.article)
+      const article = await articleService.update(
+        req.params.slug,
+        body.article,
+        req.user!.id,
+      )
       res.json({ article })
     },
   )
@@ -81,15 +87,15 @@ export const initArticleModule = (app: Router) => {
   })
   // 收藏
   articles.post('/:slug/favorite', async (req, res, next) => {
-    const result = await articleService.favorite(req.params.slug, req.user!.id)
-    res.json({ code: 200 })
+    const article = await articleService.favorite(req.params.slug, req.user!.id)
+    res.json({ article })
   })
   // 取消收藏
   articles.delete('/:slug/favorite', async (req, res, next) => {
-    const result = await articleService.unfavorite(
+    const article = await articleService.unfavorite(
       req.params.slug,
       req.user!.id,
     )
-    res.json({ code: 200 })
+    res.json({ article })
   })
 }

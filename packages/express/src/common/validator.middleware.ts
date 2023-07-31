@@ -2,6 +2,8 @@ import type { NextFunction, RequestHandler } from 'express'
 import { validateOrReject, ValidatorOptions } from 'class-validator'
 import { plainToInstance } from 'class-transformer'
 
+// 检查上传的参数, query, body
+
 const validateObject = (
   obj: any,
   classType: any,

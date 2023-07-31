@@ -15,6 +15,7 @@ app.use(express.static(join(__dirname, '../public')))
 
 initRouter('/api', app)
 
+// 最后的 error 拦截
 app.use((err: any, req: any, res: any, next: any) => {
   if (err && err.error) {
     res.status(400).json({
@@ -23,7 +24,9 @@ app.use((err: any, req: any, res: any, next: any) => {
     })
   } else {
     // pass on to another error handler
-    next(err.message || 'internal server error')
+    res.status(err.statusCode || 500).json({
+      message: err.message || 'internal server error',
+    })
     if (err.sql) {
       console.log('\nSQL: ', err.sql, '\n')
     }
