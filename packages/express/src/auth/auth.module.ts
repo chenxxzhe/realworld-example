@@ -20,15 +20,56 @@ declare global {
   }
 }
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type Trie = Map<string, { end: boolean; children: Trie }>
 
-const jwtWhitelist = new Map<Method, Set<string>>()
+const jwtWhitelist = new Map<Method, Trie>()
+const ANY = '__ANY__'
+// 按 path 路径构建前缀树
 export function setAuthFree(method: Method, path: string) {
-  let set = jwtWhitelist.get(method)
-  if (!set) {
-    set = new Set()
-    jwtWhitelist.set(method, set)
+  let trie = jwtWhitelist.get(method)!
+  if (!trie) {
+    trie = new Map()
+    jwtWhitelist.set(method, trie)
   }
-  set.add(path)
+  let node = { end: false, children: trie }
+  const arr = path.split('/').slice(1)
+  for (let dir of arr) {
+    if (dir.match(/^:.+$/)) {
+      dir = ANY
+    }
+    if (node.children.has(dir)) {
+      node = node.children.get(dir)!
+    } else {
+      const next = { end: false, children: new Map() }
+      node.children.set(dir, next)
+      node = next
+    }
+  }
+  node.end = true
+}
+
+function checkIsAuthFree(method: Method, path: string) {
+  // 与 /article/:slug 冲突了
+  if (path === '/articles/feed') return false
+
+  const trie = jwtWhitelist.get(method)!
+  if (!trie) return false
+
+  let node = { end: false, children: trie }
+  const pass = path
+    .split('/')
+    .slice(1)
+    .every((dir) => {
+      if (node?.children.has(dir)) {
+        node = node.children.get(dir)!
+      } else if (node?.children.has(ANY)) {
+        node = node.children.get(ANY)!
+      } else {
+        return false
+      }
+      return true
+    })
+  return pass && node.end
 }
 
 export const initAuthModule = (app: Router) => {
@@ -86,7 +127,11 @@ export const initAuthModule = (app: Router) => {
 
   // 全局路由使用 jwt, 白名单额外配置 setAuthFree
   const authMiddleware: RequestHandler = (req, res, next) => {
-    if (jwtWhitelist.get(req.method as any)?.has(req.path)) return next()
+    if (
+      !req.get('Authorization') &&
+      checkIsAuthFree(req.method as any, req.path)
+    )
+      return next()
     passport.authenticate('jwt', { session: false })(req, res, next)
   }
 

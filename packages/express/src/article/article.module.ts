@@ -34,6 +34,7 @@ export const initArticleModule = (app: Router) => {
     },
   )
   // 获取 文章详情
+  setAuthFree('GET', '/articles/:slug')
   articles.get('/:slug', async (req, res, next) => {
     const article = await articleService.findOne(req.params.slug, req.user?.id)
     res.json({ article })
