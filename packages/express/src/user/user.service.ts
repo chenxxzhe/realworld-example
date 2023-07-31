@@ -13,7 +13,7 @@ export function findBy(
   if (currentUserId) {
     return pool
       .query(
-        'SELECT ??, COUNT(ruu.follower) AS Following FROM user LEFT JOIN ref_user_user ruu ON ruu.follower=? WHERE ??=? AND deleted=0',
+        'SELECT ??, EXISTS(SELECT id FROM ref_follow WHERE status=1 AND target=user.id AND follower=?) following FROM user WHERE ??=? AND user.deleted=0',
         [
           withPassword ? userColumnsWithPassword : userColumns,
           currentUserId,
@@ -49,14 +49,14 @@ export function remove(userId: number) {
 
 export function follow(targetId: number, followerId: number) {
   return pool.query(
-    'INSERT INTO ref_user_user SET ? ON DUPLICATE KEY UPDATE status=1',
+    'INSERT INTO ref_follow SET ? ON DUPLICATE KEY UPDATE status=1',
     [{ target: targetId, follower: followerId, status: 1 }],
   )
 }
 
 export function unfollow(targetId: number, followerId: number) {
   return pool.query(
-    'UPDATE ref_user_user SET status=0 WHERE target=? AND follower=?',
+    'UPDATE ref_follow SET status=0 WHERE target=? AND follower=?',
     [targetId, followerId],
   )
 }

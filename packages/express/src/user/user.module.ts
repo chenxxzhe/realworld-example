@@ -82,14 +82,17 @@ export const initUserModule = (app: Router) => {
   //     "following": false
   //   }
   // }
+  setAuthFree('GET', '/profiles/:username')
   profiles.get('/:username', async (req, res) => {
-    const user = await userService.findBy(
+    const profile = await userService.findBy(
       'username',
       req.params.username,
       req.user?.id,
     )
-    user.following = !!user.following
-    res.send({ user })
+    if (profile) {
+      profile.following = !!profile.following
+    }
+    res.send({ profile })
   })
 
   // 关注用户
@@ -98,7 +101,7 @@ export const initUserModule = (app: Router) => {
     const target = await userService.findBy('username', username)
     await userService.follow(target.id, req.user!.id)
     target.following = true
-    res.send({ user: target })
+    res.send({ profile: target })
   })
 
   // 取消关注
@@ -108,6 +111,6 @@ export const initUserModule = (app: Router) => {
     const target = await userService.findBy('username', username)
     await userService.unfollow(target.id, req.user!.id)
     target.following = false
-    res.send({ user: target })
+    res.send({ profile: target })
   })
 }
