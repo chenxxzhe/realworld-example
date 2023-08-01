@@ -7,5 +7,5 @@ class CreateCommentDtoBase {
 
 export class CreateCommentDto {
   @ValidateNested()
-  article: CreateCommentDtoBase
+  comment: CreateCommentDtoBase
 }

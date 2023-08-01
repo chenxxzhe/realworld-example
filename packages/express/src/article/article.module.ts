@@ -60,18 +60,21 @@ export const initArticleModule = (app: Router) => {
     },
   )
   // 删除
-  // TODO: 检查角色
   articles.delete('/:slug', async (req, res, next) => {
-    const result = await articleService.remove(req.params.slug)
-    res.json({ code: 200 })
+    const detail = await articleService.remove(req.params.slug, req.user!.id)
+    res.json({ detail })
   })
   // 添加 评论
   articles.post(
     '/:slug/comments',
     validateBody(CreateCommentDto),
     async (req, res, next) => {
-      const result = await commentService.create(req.params.slug, req.body)
-      res.json({ comment: req.body })
+      const comment = await commentService.create(
+        req.params.slug,
+        req.body.comment,
+        req.user!.id,
+      )
+      res.json({ comment })
     },
   )
   // 获取 文章所有评论
@@ -81,10 +84,9 @@ export const initArticleModule = (app: Router) => {
     res.json({ comments })
   })
   // 删除 评论
-  // TODO: 检查角色
   articles.delete('/:slug/comments/:id', async (req, res, next) => {
-    const result = await commentService.remove(+req.params.id)
-    res.json({ code: 200 })
+    const detail = await commentService.remove(+req.params.id, req.user!.id)
+    res.json({ detail })
   })
   // 收藏
   articles.post('/:slug/favorite', async (req, res, next) => {

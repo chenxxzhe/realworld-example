@@ -89,7 +89,8 @@ const queryArticleSQL = ({
     ? 'JOIN ref_follow rfo ON rfo.target=a.authorId AND rfo.follower=' +
       pool.escape(userId)
     : ''
-  const whereStatement = where?.length ? 'WHERE ' + where.join(' AND ') : ''
+  const whereStatement =
+    'WHERE a.deleted=0' + (where?.length ? ' AND ' + where.join(' AND ') : '')
   const limitStatement = count
     ? ''
     : `
@@ -265,8 +266,17 @@ export async function update(slug: string, data: Article, userId: number) {
     })
 }
 
-export function remove(slug: string) {
-  return pool.query('UPDATE article SET deleted=1 WHERE slug=?', [slug])
+export function remove(slug: string, userId: number) {
+  return pool
+    .query<OkPacket>(
+      'UPDATE article SET deleted=1 WHERE slug=? AND deleted=0 AND authorId=?',
+      [slug, userId],
+    )
+    .then((res) => {
+      if (res[0].affectedRows === 0)
+        throw { statusCode: 403, message: 'Forbidden, you are not owner' }
+      return res[0]
+    })
 }
 
 export function favorite(slug: string, userId: number) {

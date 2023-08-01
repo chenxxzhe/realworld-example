@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import { join } from 'path'
 import cookieParser from 'cookie-parser'
 import morgan = require('morgan')
@@ -16,8 +16,10 @@ app.use(express.static(join(__dirname, '../public')))
 initRouter('/api', app)
 
 // 最后的 error 拦截
-app.use((err: any, req: any, res: any, next: any) => {
+app.use((err: any, req: Request, res: Response, next: any) => {
+  // next 参数不用也不能删, use 内部使用参数数量来判断中间件是否错误捕获器
   if (err && err.error) {
+    console.log(JSON.stringify({ query: req.query, body: req.body }))
     res.status(400).json({
       message: err.error.message,
       detail: err.error.detail,
