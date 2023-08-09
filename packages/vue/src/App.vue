@@ -1,9 +1,10 @@
-<script setup lang="ts">
-</script>
+<!-- <script setup lang="ts">
+</script> -->
 
 <template>
-  <div>
-  </div>
+  <keep-alive>
+    <router-view></router-view>
+  </keep-alive>
 </template>
 
 <style scoped>
