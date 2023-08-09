@@ -7,6 +7,9 @@
 			"path": "../packages/express"
 		},
 		{
+			"path": "../packages/vue"
+		},
+		{
 			"path": "../",
       "name": "root"
 		}
